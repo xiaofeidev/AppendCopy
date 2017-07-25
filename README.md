@@ -1,6 +1,8 @@
 # AppendCopy
 复制拼接
 
+<img src="https://github.com/xiaofei-dev/AppendCopy/blob/master/app/src/main/res/drawable/ic_launcher.png" width="140%" height="140%">
+
 一个实现 非连续复制 的小工具。
 
 本应用没有界面！！！打开后会自动转到后台运行并开始监听复制事件。
