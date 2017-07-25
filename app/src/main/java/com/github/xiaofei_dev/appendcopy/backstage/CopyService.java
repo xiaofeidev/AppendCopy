@@ -44,6 +44,8 @@ public final class CopyService extends Service {
     private boolean isFrist = true;
     private static final String TAG = "CopyService";
 
+    private ClipboardManager cmb;
+
 
     @Override
     public void onCreate() {
@@ -84,7 +86,14 @@ public final class CopyService extends Service {
         }else {
             //由提示悬浮窗将内容复制至剪贴板的情况下不做任何操作，只是重置 isFrist 的值为 true
             isFrist = true;
+
+            return super.onStartCommand(intent, flags, startId);
         }
+
+        cmb = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+        ClipData data = ClipData.newPlainText("content", "");
+        cmb.setPrimaryClip(data);
+
         return super.onStartCommand(intent, flags, startId);
     }
 
@@ -200,7 +209,7 @@ public final class CopyService extends Service {
             public void onClick(View v) {
                 //Log.d(TAG, "onClick: " + mStringBuilder.toString());
                 //将拼接好的内容复制至剪贴板
-                ClipboardManager cmb = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+                cmb = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
                 ClipData data = ClipData.newPlainText("content", mStringBuilder.toString());
                 cmb.setPrimaryClip(data);
                 Toast.makeText(getApplicationContext(),R.string.success,Toast.LENGTH_SHORT).show();
@@ -226,6 +235,7 @@ public final class CopyService extends Service {
         mLayoutParams = new WindowManager.LayoutParams();
         mLayoutParams.gravity = Gravity.TOP|Gravity.END;
         mLayoutParams.type = WindowManager.LayoutParams.TYPE_TOAST;
+//        mLayoutParams.type = WindowManager.LayoutParams.TYPE_SYSTEM_ERROR;
         mLayoutParams.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL
                 | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
                 | WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH;

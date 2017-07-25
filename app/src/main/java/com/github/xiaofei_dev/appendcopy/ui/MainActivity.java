@@ -4,7 +4,11 @@ import android.app.Activity;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
+import android.util.Log;
+import android.widget.Toast;
 
 import com.github.xiaofei_dev.appendcopy.R;
 import com.github.xiaofei_dev.appendcopy.backstage.CopyService;
@@ -12,11 +16,14 @@ import com.github.xiaofei_dev.appendcopy.util.ToastUtil;
 
 public final class MainActivity extends Activity {
 
+    public static int OVERLAY_PERMISSION_REQ_CODE = 110;
+    private static final String TAG = "MainActivity";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //setContentView(R.layout.activity_main);
         clipBoardMonitor();
+
     }
 
     @Override
@@ -24,16 +31,83 @@ public final class MainActivity extends Activity {
         super.onStart();
         moveTaskToBack(true);
 //        Toast.makeText(getApplicationContext(),R.string.begin,Toast.LENGTH_LONG).show();
-        ToastUtil.showToast(getApplicationContext(),getString(R.string.begin));
+
+        if(Build.VERSION.SDK_INT >= 23){
+            if(Settings.canDrawOverlays(this)){
+//                //有悬浮窗权限则开启服务
+//                clipBoardMonitor();
+//                ToastUtil.showToast(this,getString(R.string.begin));
+                //有悬浮窗权限则只弹出提示消息
+                ToastUtil.showToast(getApplicationContext(),getString(R.string.begin));
+            }else {
+                //没有悬浮窗权限,去开启悬浮窗权限
+                ToastUtil.showToast(this,"您需要授予应用在其他应用的上层显示的权限才可正常使用");
+                try{
+                    Intent  intent=new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION);
+                    startActivityForResult(intent, OVERLAY_PERMISSION_REQ_CODE);
+                }catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        }else {
+            //
+        }
+
+        Log.d(TAG, "onStart: ");
     }
 
     @Override
-    protected void onRestart() {
-        super.onRestart();
-        moveTaskToBack(true);
-//        Toast.makeText(getApplicationContext(),R.string.begin,Toast.LENGTH_LONG).show();
-        ToastUtil.showToast(getApplicationContext(),getString(R.string.begin));
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+//        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == OVERLAY_PERMISSION_REQ_CODE) {
+            if(Build.VERSION.SDK_INT>=23) {
+                if (!Settings.canDrawOverlays(this)) {
+                    ToastUtil.showToast(this,"获取权限失败，应用将无法工作");
+//                    moveTaskToBack(true);
+                    finish();
+                } else {
+//                    ToastUtil.showToast(this,"获取权限成功！应用可以正常使用了");
+                    Toast.makeText(getApplicationContext(),"获取权限成功！应用可以正常使用了",Toast.LENGTH_SHORT).show();
+//                    moveTaskToBack(true);
+//                    //悬浮窗权限获取成功，开启服务
+//                    clipBoardMonitor();
+
+                }
+            }
+        }
+
+        Log.d(TAG, "onActivityResult: ");
     }
+
+//    @Override
+//    protected void onRestart() {
+//        super.onRestart();
+//        moveTaskToBack(true);
+//
+//        if(Build.VERSION.SDK_INT >= 23){
+//            if(Settings.canDrawOverlays(this)){
+//                //有悬浮窗权限则只弹出提示消息
+//                ToastUtil.showToast(getApplicationContext(),getString(R.string.begin));
+//            }else {
+//                //没有悬浮窗权限,去开启悬浮窗权限
+//                ToastUtil.showToast(this,"应用的悬浮窗权限被拒绝，请重启应用以获取");
+////                try{
+////                    Intent  intent=new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION);
+////                    startActivityForResult(intent, OVERLAY_PERMISSION_REQ_CODE);
+////                }catch (Exception e)
+////                {
+////                    e.printStackTrace();
+////                }
+//            }
+//        }else {
+//            //
+//        }
+//
+//        Log.d(TAG, "onRestart: ");
+//    }
+
+
 
     @Override
     protected void onDestroy() {
@@ -41,6 +115,7 @@ public final class MainActivity extends Activity {
         Intent intent = new Intent(MainActivity.this,CopyService.class);
         stopService(intent);
         moveTaskToBack(true);
+        Log.d(TAG, "onDestroy: ");
     }
 
     /**
