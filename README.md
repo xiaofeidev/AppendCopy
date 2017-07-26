@@ -1,7 +1,7 @@
 # AppendCopy
 复制拼接
 
-<img src="https://github.com/xiaofei-dev/AppendCopy/blob/master/app/src/main/res/drawable/ic_launcher.png" width="40%" height="40%">
+<img src="https://github.com/xiaofei-dev/AppendCopy/blob/master/app/src/main/res/drawable/ic_launcher.png" width="20%" height="20%">
 
 一个实现 非连续复制 的小工具。
 
