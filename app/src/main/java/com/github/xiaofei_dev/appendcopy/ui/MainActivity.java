@@ -76,8 +76,6 @@ public final class MainActivity extends Activity {
                 }
             }
         }
-
-        Log.d(TAG, "onActivityResult: ");
     }
 
 //    @Override

@@ -2,6 +2,6 @@
     <string name="app_name">复制拼接</string>
     <!--<string name="checkBox">监听复制事件</string>-->
     <string name="begin">应用已转至后台默默工作</string>
-    <string name="begin_listening_clip">已开始在后台拼接复制内容</string>
-    <string name="success">已将所有复制文本拼接至剪贴板</string>
+    <string name="begin_listening_clip">开始拼接复制内容</string>
+    <string name="success">已将所有文本拼接至剪贴板</string>
 </resources>

@@ -17,7 +17,6 @@ import android.view.WindowManager;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
-
 import com.github.xiaofei_dev.appendcopy.R;
 
 
@@ -111,7 +110,6 @@ public final class CopyService extends Service {
 
     private synchronized void addView(){
         if(!isAddView){
-
             iconFloatView.clearAnimation();
             iconFloatView.setAlpha(0);
             iconFloatView.setVisibility(View.VISIBLE);
@@ -234,7 +232,13 @@ public final class CopyService extends Service {
 
         mLayoutParams = new WindowManager.LayoutParams();
         mLayoutParams.gravity = Gravity.TOP|Gravity.END;
-        mLayoutParams.type = WindowManager.LayoutParams.TYPE_TOAST;
+        /*if (Build.VERSION.SDK_INT > 24) {
+            //7.0 以上的系统限制了 TOAST 类型悬浮窗的使用
+            mLayoutParams.type = WindowManager.LayoutParams.TYPE_PHONE;
+        } else {
+            mLayoutParams.type = WindowManager.LayoutParams.TYPE_TOAST;
+        }*/
+        mLayoutParams.type = WindowManager.LayoutParams.TYPE_PHONE;
 //        mLayoutParams.type = WindowManager.LayoutParams.TYPE_SYSTEM_ERROR;
         mLayoutParams.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL
                 | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
