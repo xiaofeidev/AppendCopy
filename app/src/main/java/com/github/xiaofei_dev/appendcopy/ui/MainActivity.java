@@ -4,8 +4,10 @@ import android.app.Activity;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.Settings;
 import android.util.Log;
 import android.widget.Toast;
@@ -18,6 +20,8 @@ public final class MainActivity extends Activity {
 
     public static int OVERLAY_PERMISSION_REQ_CODE = 110;
     private static final String TAG = "MainActivity";
+
+    private Handler mHandler = new Handler();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,14 +45,10 @@ public final class MainActivity extends Activity {
                 ToastUtil.showToast(getApplicationContext(),getString(R.string.begin));
             }else {
                 //没有悬浮窗权限,去开启悬浮窗权限
-                ToastUtil.showToast(this,"您需要授予应用在其他应用的上层显示的权限才可正常使用");
-                try{
-                    Intent  intent=new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION);
-                    startActivityForResult(intent, OVERLAY_PERMISSION_REQ_CODE);
-                }catch (Exception e)
-                {
-                    e.printStackTrace();
-                }
+//                ToastUtil.showToast(this,"您需要授予应用在其他应用的上层显示的权限才可正常使用");
+                Intent intent1 = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION, Uri.parse("package:" + getPackageName()));
+                intent1.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivityForResult(intent1, OVERLAY_PERMISSION_REQ_CODE);
             }
         }else {
             //
@@ -59,22 +59,27 @@ public final class MainActivity extends Activity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-//        super.onActivityResult(requestCode, resultCode, data);
+        super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == OVERLAY_PERMISSION_REQ_CODE) {
-            if(Build.VERSION.SDK_INT>=23) {
-                if (!Settings.canDrawOverlays(this)) {
-                    ToastUtil.showToast(this,"获取权限失败，应用将无法工作");
-//                    moveTaskToBack(true);
-                    finish();
-                } else {
-//                    ToastUtil.showToast(this,"获取权限成功！应用可以正常使用了");
-                    Toast.makeText(getApplicationContext(),"获取权限成功！应用可以正常使用了",Toast.LENGTH_SHORT).show();
+            mHandler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    if(Build.VERSION.SDK_INT>=23) {
+                        if (Settings.canDrawOverlays(MainActivity.this)) {
+                            Toast.makeText(getApplicationContext(),"获取权限成功！应用可以正常使用了",Toast.LENGTH_SHORT).show();
+//                            Log.d(TAG, "获取权限成功！应用可以正常使用了");
 //                    moveTaskToBack(true);
 //                    //悬浮窗权限获取成功，开启服务
 //                    clipBoardMonitor();
-
+                        } else {
+                            ToastUtil.showToast(getApplicationContext(),"获取权限失败，应用将无法工作");
+//                            Log.d(TAG, "获取权限失败，应用将无法工作");
+//                    moveTaskToBack(true);
+                            finish();
+                        }
+                    }
                 }
-            }
+            }, 0);
         }
     }
 
@@ -104,8 +109,6 @@ public final class MainActivity extends Activity {
 //
 //        Log.d(TAG, "onRestart: ");
 //    }
-
-
 
     @Override
     protected void onDestroy() {
